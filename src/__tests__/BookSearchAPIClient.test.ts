@@ -1,7 +1,8 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { BookSearchApiClient } from "../BookSearchApiClient";
-import { Book } from "../types";
+import { BookSearchApiClient } from "../services/book/BookSearchApiClient";
+import { Book } from "../types/book.types";
+import { ResponseFormat } from "../types/api.types";
 import {
   mockSingleBookJSONData,
   mockMultipleBooksJSONData,
@@ -23,7 +24,7 @@ describe("BookSearchApiClient", () => {
   describe("JSON format", () => {
     it("should fetch books in JSON format", async () => {
       // Arrange
-      const client = new BookSearchApiClient("json");
+      const client = new BookSearchApiClient(ResponseFormat.JSON);
       mock
         .onGet("http://api.book-seller-example.com/by-author")
         .reply(200, mockSingleBookJSONData);
@@ -45,7 +46,7 @@ describe("BookSearchApiClient", () => {
 
     it("should fetch multiple books in JSON format", async () => {
       // Arrange
-      const client = new BookSearchApiClient("json");
+      const client = new BookSearchApiClient(ResponseFormat.JSON);
       mock
         .onGet("http://api.book-seller-example.com/by-author")
         .reply(200, mockMultipleBooksJSONData);
@@ -71,12 +72,25 @@ describe("BookSearchApiClient", () => {
         },
       ]);
     });
+
+    it("should fail if the API returns an error", async () => {
+      // Arrange
+      const client = new BookSearchApiClient(ResponseFormat.JSON);
+      mock
+        .onGet("http://api.book-seller-example.com/by-author")
+        .reply(500, "Internal Server Error");
+
+      // Act
+      await expect(client.getBooksByAuthor("Jack Quinton", 1)).rejects.toThrow(
+        "Request failed with status code: 500"
+      );
+    });
   });
 
   describe("XML format", () => {
     it("should fetch books in XML format", async () => {
       // Arrange
-      const client = new BookSearchApiClient("xml");
+      const client = new BookSearchApiClient(ResponseFormat.XML);
 
       mock
         .onGet("http://api.book-seller-example.com/by-author")
@@ -99,7 +113,7 @@ describe("BookSearchApiClient", () => {
 
     it("should fetch multiple books in XML format", async () => {
       // Arrange
-      const client = new BookSearchApiClient("xml");
+      const client = new BookSearchApiClient(ResponseFormat.XML);
       mock
         .onGet("http://api.book-seller-example.com/by-author")
         .reply(200, mockMultipleBooksXmlData);
@@ -130,7 +144,7 @@ describe("BookSearchApiClient", () => {
   describe("Test different query types", () => {
     it("should fetch by publisher", async () => {
       // Arrange
-      const client = new BookSearchApiClient("json");
+      const client = new BookSearchApiClient(ResponseFormat.JSON);
       mock
         .onGet("http://api.book-seller-example.com/by-publisher")
         .reply(200, mockSingleBookJSONData);
@@ -155,7 +169,7 @@ describe("BookSearchApiClient", () => {
 
     it("should fetch by year", async () => {
       // Arrange
-      const client = new BookSearchApiClient("json");
+      const client = new BookSearchApiClient(ResponseFormat.JSON);
       mock
         .onGet("http://api.book-seller-example.com/by-year")
         .reply(200, mockSingleBookJSONData);
@@ -177,7 +191,7 @@ describe("BookSearchApiClient", () => {
 
     it("should fetch by isbn", async () => {
       // Arrange
-      const client = new BookSearchApiClient("json");
+      const client = new BookSearchApiClient(ResponseFormat.JSON);
       mock
         .onGet("http://api.book-seller-example.com/by-isbn")
         .reply(200, mockSingleBookJSONData);
