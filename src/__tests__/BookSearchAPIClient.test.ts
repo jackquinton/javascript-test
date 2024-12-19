@@ -16,12 +16,37 @@ describe("BookSearchApiClient", () => {
 
   describe("JSON format", () => {
     // Mock data for JSON format
-    const mockData = [
+    const mockSingleBookJSONData = [
       {
         book: {
-          title: "Book Title 1",
-          author: "Author Name",
+          title: "Jacks First Book",
+          author: "Jack Quinton",
           isbn: "1234567890",
+        },
+        stock: {
+          quantity: 10,
+          price: 19.99,
+        },
+      },
+    ];
+
+    const mockMultipleBooksJSONData = [
+      {
+        book: {
+          title: "Jacks First Book",
+          author: "Jack Quinton",
+          isbn: "1234567890",
+        },
+        stock: {
+          quantity: 10,
+          price: 19.99,
+        },
+      },
+      {
+        book: {
+          title: "Jacks Second Book",
+          author: "Jack Quinton",
+          isbn: "1234567891",
         },
         stock: {
           quantity: 10,
@@ -35,17 +60,46 @@ describe("BookSearchApiClient", () => {
       const client = new BookSearchApiClient("json");
       mock
         .onGet("http://api.book-seller-example.com/by-author")
-        .reply(200, mockData);
+        .reply(200, mockSingleBookJSONData);
 
       // Act
-      const books: Book[] = await client.getBooksByAuthor("Author Name", 1);
+      const books: Book[] = await client.getBooksByAuthor("Jack Quinton", 1);
 
       // Assert
       expect(books).toEqual([
         {
-          title: "Book Title 1",
-          author: "Author Name",
+          title: "Jacks First Book",
+          author: "Jack Quinton",
           isbn: "1234567890",
+          quantity: 10,
+          price: 19.99,
+        },
+      ]);
+    });
+
+    it("should fetch multiple books in JSON format", async () => {
+      // Arrange
+      const client = new BookSearchApiClient("json");
+      mock
+        .onGet("http://api.book-seller-example.com/by-author")
+        .reply(200, mockMultipleBooksJSONData);
+
+      // Act
+      const books: Book[] = await client.getBooksByAuthor("Jack Quinton", 2);
+
+      // Assert
+      expect(books).toEqual([
+        {
+          title: "Jacks First Book",
+          author: "Jack Quinton",
+          isbn: "1234567890",
+          quantity: 10,
+          price: 19.99,
+        },
+        {
+          title: "Jacks Second Book",
+          author: "Jack Quinton",
+          isbn: "1234567891",
           quantity: 10,
           price: 19.99,
         },
@@ -59,8 +113,8 @@ describe("BookSearchApiClient", () => {
       <books>
         <book>
           <details>
-            <title>Book Title 1</title>
-            <author>Author Name</author>
+            <title>Jacks First Book</title>
+            <author>Jack Quinton</author>
             <isbn>1234567890</isbn>
           </details>
           <stock>
@@ -75,8 +129,8 @@ describe("BookSearchApiClient", () => {
       <books>
         <book>
           <details>
-            <title>Book Title 1</title>
-            <author>Author Name</author>
+            <title>Jacks First Book</title>
+            <author>Jack Quinton</author>
             <isbn>1234567890</isbn>
           </details>
           <stock>
@@ -86,8 +140,8 @@ describe("BookSearchApiClient", () => {
         </book>
         <book>
           <details>
-            <title>Book Title 2</title>
-            <author>Author Name</author>
+            <title>Jacks Second Book</title>
+            <author>Jack Quinton</author>
             <isbn>1234567891</isbn>
           </details>
           <stock>
@@ -107,13 +161,13 @@ describe("BookSearchApiClient", () => {
         .reply(200, mockSingleBookXmlData);
 
       // Act
-      const books: Book[] = await client.getBooksByAuthor("Author Name", 1);
+      const books: Book[] = await client.getBooksByAuthor("Jack Quinton", 1);
 
       // Assert
       expect(books).toEqual([
         {
-          title: "Book Title 1",
-          author: "Author Name",
+          title: "Jacks First Book",
+          author: "Jack Quinton",
           isbn: "1234567890",
           quantity: 10,
           price: 19.99,
@@ -129,20 +183,20 @@ describe("BookSearchApiClient", () => {
         .reply(200, mockMultipleBooksXmlData);
 
       // Act
-      const books: Book[] = await client.getBooksByAuthor("Author Name", 2);
+      const books: Book[] = await client.getBooksByAuthor("Jack Quinton", 2);
 
       // Assert
       expect(books).toEqual([
         {
-          title: "Book Title 1",
-          author: "Author Name",
+          title: "Jacks First Book",
+          author: "Jack Quinton",
           isbn: "1234567890",
           quantity: 10,
           price: 19.99,
         },
         {
-          title: "Book Title 2",
-          author: "Author Name",
+          title: "Jacks Second Book",
+          author: "Jack Quinton",
           isbn: "1234567891",
           quantity: 10,
           price: 19.99,
