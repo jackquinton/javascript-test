@@ -1,8 +1,8 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { BookSearchApiClient } from "../services/book/BookSearchApiClient";
-import { Book } from "../types/book.types";
-import { ResponseFormat } from "../types/api.types";
+import { BookSearchApiClient } from "../BookSearchApiClient";
+import { Book } from "../../../types/book.types";
+import { ResponseFormat } from "../../../types/api.types";
 import {
   mockSingleBookJSONData,
   mockMultipleBooksJSONData,
