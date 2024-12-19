@@ -17,11 +17,33 @@ export class BookSearchApiClient {
     authorName: string,
     limit: number
   ): Promise<Book[]> {
+    return this.executeQuery("/by-author", { q: authorName, limit });
+  }
+
+  public async getBooksByPublisher(
+    publisher: string,
+    limit: number
+  ): Promise<Book[]> {
+    return this.executeQuery("/by-publisher", { q: publisher, limit });
+  }
+
+  public async getBooksByYear(year: number, limit: number): Promise<Book[]> {
+    return this.executeQuery("/by-year", { year, limit });
+  }
+
+  public async getBooksByIsbn(isbn: string): Promise<Book> {
+    const books = await this.executeQuery("/by-isbn", { isbn });
+    return books[0];
+  }
+
+  private async executeQuery(
+    endpoint: string,
+    params: Record<string, any>
+  ): Promise<Book[]> {
     try {
-      const response = await this.axiosInstance("/by-author", {
+      const response = await this.axiosInstance(endpoint, {
         params: {
-          q: authorName,
-          limit,
+          ...params,
           format: this.format,
         },
       });
@@ -32,7 +54,7 @@ export class BookSearchApiClient {
         throw new Error("Request failed with status code: " + response.status);
       }
     } catch (error) {
-      console.error("Error fetching books by author:", error);
+      console.error(`Error fetching books from ${endpoint}:`, error);
       throw error;
     }
   }
