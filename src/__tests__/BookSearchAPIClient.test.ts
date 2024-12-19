@@ -2,6 +2,12 @@ import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { BookSearchApiClient } from "../BookSearchApiClient";
 import { Book } from "../types";
+import {
+  mockSingleBookJSONData,
+  mockMultipleBooksJSONData,
+  mockSingleBookXmlData,
+  mockMultipleBooksXmlData,
+} from "./fixtures/bookMocks";
 
 describe("BookSearchApiClient", () => {
   let mock: MockAdapter;
@@ -15,46 +21,6 @@ describe("BookSearchApiClient", () => {
   });
 
   describe("JSON format", () => {
-    // Mock data for JSON format
-    const mockSingleBookJSONData = [
-      {
-        book: {
-          title: "Jacks First Book",
-          author: "Jack Quinton",
-          isbn: "1234567890",
-        },
-        stock: {
-          quantity: 10,
-          price: 19.99,
-        },
-      },
-    ];
-
-    const mockMultipleBooksJSONData = [
-      {
-        book: {
-          title: "Jacks First Book",
-          author: "Jack Quinton",
-          isbn: "1234567890",
-        },
-        stock: {
-          quantity: 10,
-          price: 19.99,
-        },
-      },
-      {
-        book: {
-          title: "Jacks Second Book",
-          author: "Jack Quinton",
-          isbn: "1234567891",
-        },
-        stock: {
-          quantity: 10,
-          price: 19.99,
-        },
-      },
-    ];
-
     it("should fetch books in JSON format", async () => {
       // Arrange
       const client = new BookSearchApiClient("json");
@@ -108,50 +74,6 @@ describe("BookSearchApiClient", () => {
   });
 
   describe("XML format", () => {
-    // Mock data for XML format
-    const mockSingleBookXmlData = `
-      <books>
-        <book>
-          <details>
-            <title>Jacks First Book</title>
-            <author>Jack Quinton</author>
-            <isbn>1234567890</isbn>
-          </details>
-          <stock>
-            <quantity>10</quantity>
-            <price>19.99</price>
-          </stock>
-        </book>
-      </books>
-    `;
-
-    const mockMultipleBooksXmlData = `
-      <books>
-        <book>
-          <details>
-            <title>Jacks First Book</title>
-            <author>Jack Quinton</author>
-            <isbn>1234567890</isbn>
-          </details>
-          <stock>
-            <quantity>10</quantity>
-            <price>19.99</price>
-          </stock>
-        </book>
-        <book>
-          <details>
-            <title>Jacks Second Book</title>
-            <author>Jack Quinton</author>
-            <isbn>1234567891</isbn>
-          </details>
-          <stock>
-            <quantity>10</quantity>
-            <price>19.99</price>
-          </stock>
-        </book>
-      </books>
-    `;
-
     it("should fetch books in XML format", async () => {
       // Arrange
       const client = new BookSearchApiClient("xml");
@@ -202,6 +124,75 @@ describe("BookSearchApiClient", () => {
           price: 19.99,
         },
       ]);
+    });
+  });
+
+  describe("Test different query types", () => {
+    it("should fetch by publisher", async () => {
+      // Arrange
+      const client = new BookSearchApiClient("json");
+      mock
+        .onGet("http://api.book-seller-example.com/by-publisher")
+        .reply(200, mockSingleBookJSONData);
+
+      // Act
+      const books: Book[] = await client.getBooksByPublisher(
+        "Penguin Books",
+        1
+      );
+
+      // Assert
+      expect(books).toEqual([
+        {
+          title: "Jacks First Book",
+          author: "Jack Quinton",
+          isbn: "1234567890",
+          quantity: 10,
+          price: 19.99,
+        },
+      ]);
+    });
+
+    it("should fetch by year", async () => {
+      // Arrange
+      const client = new BookSearchApiClient("json");
+      mock
+        .onGet("http://api.book-seller-example.com/by-year")
+        .reply(200, mockSingleBookJSONData);
+
+      // Act
+      const books: Book[] = await client.getBooksByYear(2023, 1);
+
+      // Assert
+      expect(books).toEqual([
+        {
+          title: "Jacks First Book",
+          author: "Jack Quinton",
+          isbn: "1234567890",
+          quantity: 10,
+          price: 19.99,
+        },
+      ]);
+    });
+
+    it("should fetch by isbn", async () => {
+      // Arrange
+      const client = new BookSearchApiClient("json");
+      mock
+        .onGet("http://api.book-seller-example.com/by-isbn")
+        .reply(200, mockSingleBookJSONData);
+
+      // Act
+      const book: Book = await client.getBooksByIsbn("1234567890");
+
+      // Assert
+      expect(book).toEqual({
+        title: "Jacks First Book",
+        author: "Jack Quinton",
+        isbn: "1234567890",
+        quantity: 10,
+        price: 19.99,
+      });
     });
   });
 });
