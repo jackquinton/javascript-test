@@ -4,7 +4,10 @@
   "description": "`BookSearchApiClient` is a simple class that makes a call to a http API to retrieve a list of books and return them.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc",
+    "start": "node dist/example-client.js",
+    "dev": "ts-node src/example-client.ts"
   },
   "keywords": [],
   "author": "",
