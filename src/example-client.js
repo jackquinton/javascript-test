@@ -1,4 +1,4 @@
-const BookSearchApiClient = require("./BookSearchApiClient.ts");
+const BookSearchApiClient = require("./services/book/BookSearchApiClient.ts");
 
 const client = new BookSearchApiClient();
 
